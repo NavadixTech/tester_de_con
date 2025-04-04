@@ -29,7 +29,7 @@ $(TEST_EXEC): $(TEST_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(RADAR_OBJ) $(TEST_OBJ) $(RADAR_EXEC) $(TEST_EXEC)
+	rm -f $(RADAR_OBJ) $(TEST_OBJ) $(TEST_EXEC)
 
 tests_run: $(TEST_EXEC)
 	./$(TEST_EXEC) --verbose || (echo "Tests failed"; exit 1)
