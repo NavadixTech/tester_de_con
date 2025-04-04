@@ -12,6 +12,6 @@ int main(void) {
 
 
 
-    printf("Hello, Chocolatine CI!\n                                                                                          ");
+    printf("Hello, Chocolatine CI!\n                                                                                        ");
     return 0;
 }
