@@ -24,29 +24,30 @@ jobs:
       - uses: actions/checkout@v4
       - id: check_coding_style
         run: |
-          check.sh $(pwd) $(pwd)
+          #!/bin/bash
+          set -e  # Arrêter le script en cas d'erreur
+          
+          check.sh "$(pwd)" "$(pwd)"
 
-          # Vérifier si le fichier coding-style-reports.log existe et contient des erreurs
-          if [[ -f $(pwd)/coding-style-reports.log && -s $(pwd)/coding-style-reports.log ]]; then
+          LOG_FILE="$(pwd)/coding-style-reports.log"
+
+          # Vérifier si le fichier existe et contient des erreurs
+          if [[ -f "$LOG_FILE" && -s "$LOG_FILE" ]]; then
             echo "⚠️ Erreurs de coding style détectées :"
-
+            
             while IFS= read -r ERROR_LINE; do
-              # Séparation des informations par les `:` et stockage dans un tableau
               IFS=':' read -ra ERR_ARRAY <<< "$ERROR_LINE"
-
-              # Vérification que le tableau contient assez d'éléments (évite les erreurs)
               if [[ ${#ERR_ARRAY[@]} -ge 5 ]]; then
                 FILE_PATH="${ERR_ARRAY[1]#./}"
                 LINE_NUMBER="${ERR_ARRAY[2]}"
                 ERROR_TYPE="${ERR_ARRAY[3]}"
                 ERROR_DESC="${ERR_ARRAY[4]}"
-
-                # Ajout du message d'erreur GitHub Actions
+                
                 echo "::error file=$FILE_PATH,line=$LINE_NUMBER,title=$ERROR_TYPE::$ERROR_DESC"
               fi
-            done < $(pwd)/coding-style-reports.log
+            done < "$LOG_FILE"
 
-            exit 1  # Forcer l'échec du job en cas d'erreur
+            exit 1  # Échec du job en cas d'erreurs
           else
             echo "✅ Aucun problème de coding style détecté."
           fi
