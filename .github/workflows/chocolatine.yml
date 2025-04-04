@@ -13,45 +13,34 @@ env:
   BANNED_FUNCTIONS: "strcpy strcat gets system"
 
 jobs:
-  check_coding_style:
-    name: "Coding Style Check"
-    runs-on: ubuntu-latest
-    continue-on-error: false
-    container:
-      image: ghcr.io/epitech/coding-style-checker:latest
-    if: ${{ github.repository != 'EpitechPGEPromo2029/B-DOP-200-MLN-2-1-chocolatine-sacha.lamour' }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: check_coding_style
-        run: |
-          #!/bin/bash
-          set -e  # Arrêter le script en cas d'erreur
-          
-          check.sh "$(pwd)" "$(pwd)"
-
-          LOG_FILE="$(pwd)/coding-style-reports.log"
-
-          # Vérifier si le fichier existe et contient des erreurs
-          if [[ -f "$LOG_FILE" && -s "$LOG_FILE" ]]; then
-            echo "⚠️ Erreurs de coding style détectées :"
-            
-            while IFS= read -r ERROR_LINE; do
-              IFS=':' read -ra ERR_ARRAY <<< "$ERROR_LINE"
-              if [[ ${#ERR_ARRAY[@]} -ge 5 ]]; then
-                FILE_PATH="${ERR_ARRAY[1]#./}"
-                LINE_NUMBER="${ERR_ARRAY[2]}"
-                ERROR_TYPE="${ERR_ARRAY[3]}"
-                ERROR_DESC="${ERR_ARRAY[4]}"
-                
-                echo "::error file=$FILE_PATH,line=$LINE_NUMBER,title=$ERROR_TYPE::$ERROR_DESC"
-              fi
-            done < "$LOG_FILE"
-
-            exit 1  # Échec du job en cas d'erreurs
-          else
-            echo "✅ Aucun problème de coding style détecté."
-          fi
-
+check_coding_style:
+  name: "Coding Style Check"
+  runs-on: ubuntu-latest
+  continue-on-error: false
+  container:
+    image: ghcr.io/epitech/coding-style-checker:latest
+  if: ${{ github.repository != 'EpitechPGEPromo2029/B-DOP-200-MLN-2-1-chocolatine-sacha.lamour' }}
+  steps:
+    - uses: actions/checkout@v4
+    - id: check_coding_style
+      run: |
+        bash -c '
+        check.sh $(pwd) $(pwd)
+        # Vérifie si le fichier de log existe et n'est pas vide
+        if [[ -s coding-style-reports.log ]]; then
+          echo "Coding style errors detected:"
+          # Lit le fichier ligne par ligne
+          while IFS=':' read -r file line severity code; do
+            # Nettoie les chemins (supprime ./ au début)
+            file=${file#./}
+            # Formate et affiche l'erreur avec les annotations GitHub
+            echo "::error file=${file},line=${line},title=${severity} ${code}::Coding style violation detected"
+          done < coding-style-reports.log
+          exit 1
+        else
+          echo "No coding style errors detected ✅"
+          exit 0
+        fi '
 
   check_banned_functions:
     name: "Check Banned Functions"
