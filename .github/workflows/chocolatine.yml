@@ -153,3 +153,42 @@ jobs:
         with:
           target_repo_url: ${{ vars.MIRROR_URL }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+  notify_discord:
+    name: "Notify Discord"
+    runs-on: ubuntu-latest
+    if: always()  # Exécute cette étape même si les autres échouent
+    steps:
+      - name: Send Notification to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          STATUS="✅ Build Succeeded"
+          COLOR="3066993"  # Vert
+          if [[ "${{ job.status }}" != "success" ]]; then
+            STATUS="❌ Build Failed"
+            COLOR="15158332"  # Rouge
+          fi
+
+          # Construire le message en JSON
+          PAYLOAD=$(cat <<EOF
+          {
+            "username": "GitHub Actions",
+            "embeds": [{
+              "title": "${STATUS}",
+              "description": "[Voir les logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+              "color": ${COLOR},
+              "fields": [
+                { "name": "Repository", "value": "${{ github.repository }}", "inline": true },
+                { "name": "Branch", "value": "${{ github.ref_name }}", "inline": true },
+                { "name": "Initiateur", "value": "${{ github.actor }}", "inline": true }
+              ],
+              "footer": { "text": "GitHub Actions - $(date)" }
+            }]
+          }
+          EOF
+          )
+
+          # Envoyer le message à Discord
+          curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK"
+        
