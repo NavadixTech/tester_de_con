@@ -10,14 +10,15 @@
 #include <stdio.h>
 
 int main(void);
+void run_program(void);
 
 void redirect_all_stdout(void)
 {
     cr_redirect_stdout();
 }
 
-Test(main, output_test, .init = redirect_all_stdout)
+Test(run_program, output_test, .init = redirect_all_stdout)
 {
-    main();
+    run_program();
     cr_assert_stdout_eq_str("Hello, Chocolatine CI!\n");
 }

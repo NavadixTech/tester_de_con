@@ -18,10 +18,12 @@ $(EXEC): $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 run: $(EXEC)
+	mkdir -p coverage
 	./$(EXEC)
 
 clean:
 	rm -f $(OBJ) $(EXEC) *.gcno *.gcda
+	rm -rf coverage
 
 fclean: clean
 

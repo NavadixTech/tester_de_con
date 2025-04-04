@@ -8,8 +8,13 @@
 #include <stdio.h>
 #include <stdalign.h>
 
-int main(void)
+void run_program(void)
 {
     printf("Hello, Chocolatine CI!\n");
+}
+
+int main(void)
+{
+    run_program();
     return 0;
 }
