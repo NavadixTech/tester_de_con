@@ -1,20 +1,14 @@
 /*
 ** EPITECH PROJECT, 2025
-** B-DOP-200-MLN-2-1-chocolatine-sacha.lamour
+** tester_de_con
 ** File description:
 ** main
 */
 
 #include <stdio.h>
-#include <stdalign.h>
-
-void run_program(void)
-{
-    printf("Hello, Chocolatine CI!\n");
-}
 
 int main(void)
 {
-    run_program();
+    printf("Hello, this is my_radar!\n");
     return 0;
 }

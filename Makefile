@@ -1,31 +1,37 @@
 ##
 ## EPITECH PROJECT, 2025
-## B-DOP-200-MLN-2-1-chocolatine-sacha.lamour
+## tester_de_con
 ## File description:
 ## Makefile
 ##
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
-SRC = main.c
-OBJ = $(SRC:.c=.o)
-EXEC = my_radar
+CFLAGS = -Wall -I/usr/include/criterion
+LDFLAGS = -lcriterion
 
-all: $(EXEC)
+RADAR_SRC = main.c
+RADAR_OBJ = $(RADAR_SRC:.c=.o)
+RADAR_EXEC = my_radar
 
-$(EXEC): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^
+TEST_SRC = tests/main_test.c
+TEST_OBJ = $(TEST_SRC:.c=.o)
+TEST_EXEC = run_tests
+
+all: $(RADAR_EXEC)
+
+$(RADAR_EXEC): $(RADAR_OBJ)
+	$(CC) -o $@ $^
+
+$(TEST_EXEC): $(TEST_OBJ)
+	$(CC) -o $@ $^ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ)
+	rm -f $(RADAR_OBJ) $(TEST_OBJ) $(RADAR_EXEC) $(TEST_EXEC)
 
-fclean: clean
-	rm -f $(EXEC)
+tests_run: $(TEST_EXEC)
+	./$(TEST_EXEC) --verbose || (echo "Tests failed"; exit 1)
 
-re: fclean all
-
-tests_run:
-	gcc -o unit_tests tests/test_main.c main.c -lcriterion --coverage
-	./unit_tests || exit 1
-
-.PHONY: all clean fclean re tests_run
+.PHONY: all clean tests_run

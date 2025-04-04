@@ -36,7 +36,6 @@ jobs:
             fi
           '
 
-
   check_program_compilation:
     name: Check Compilation
     runs-on: ubuntu-latest
@@ -80,7 +79,11 @@ jobs:
       - name: Run Tests
         run: |
           make tests_run
-
+          TEST_RESULT=$?
+          if [ $TEST_RESULT -ne 0 ]; then
+            echo "::error:: Tests failed"
+            exit 1
+          fi
 
   push_to_mirror:
     name: Push to Mirror
