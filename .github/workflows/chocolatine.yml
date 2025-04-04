@@ -27,6 +27,7 @@ jobs:
             echo "::warning:: Found object files, removing them..."
             echo "$object_files"
             rm -f $object_files
+            make clean
           else
             echo "No .o files found."
           fi
