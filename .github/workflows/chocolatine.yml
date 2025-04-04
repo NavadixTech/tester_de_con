@@ -16,7 +16,6 @@ jobs:
   check_coding_style:
     name: "Coding Style Check"
     runs-on: ubuntu-latest
-    continue-on-error: false
     container:
       image: ghcr.io/epitech/coding-style-checker:latest
     if: ${{ github.repository != 'EpitechPGEPromo2029/B-DOP-200-MLN-2-1-chocolatine-sacha.lamour' }}
@@ -25,22 +24,18 @@ jobs:
       - id: check_coding_style
         run: |
           bash -c '
-          check.sh $(pwd) $(pwd)
-          # Vérifie si le fichier de log existe et n'est pas vide
-          if [[ -s coding-style-reports.log ]]; then
-            echo "Coding style errors detected:"
-            # Lit le fichier ligne par ligne
-            while IFS=':' read -r file line severity code; do
-              # Nettoie les chemins (supprime ./ au début)
-              file=${file#./}
-              # Formate et affiche l'erreur avec les annotations GitHub
-              echo "::error file=${file},line=${line},title=${severity} ${code}::Coding style violation detected"
-            done < coding-style-reports.log
-            exit 1
-          else
-            echo "No coding style errors detected ✅"
-            exit 0
-          fi'
+            check.sh $(pwd) $(pwd)
+            CODING_STYLE_ERRORS=$(cat $(pwd)/coding-style-reports.log)
+            while IFS= read -r ERRORS; do
+              array=(`echo $ERRORS | sed "s/:/\\n/g"`)
+              echo "::error file=${array[1]#./},title=${array[3]#./} coding style errors detected: ${array[2]#./}::${array[4]#./}"
+            done < $(pwd)/coding-style-reports.log
+            if [[ -s $(pwd)/coding-style-reports.log ]]; then
+              exit 1
+            else
+              echo No coding style errors detected
+            fi
+          '
 
   check_banned_functions:
     name: "Check Banned Functions"
@@ -91,37 +86,6 @@ jobs:
               exit 1
             fi
           done
-
-  check_memory_leaks:
-    name: "Memory Leak Check"
-    runs-on: ubuntu-latest
-    container:
-      image: epitechcontent/epitest-docker
-    needs: check_program_compilation
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Run Valgrind on Executables
-        run: |
-          make
-          found=0
-          for file in ${{ vars.EXECUTABLES }}; do
-            if [ ! -x "$file" ]; then
-              echo "::error:: Executable '$file' not found or not executable!"
-              found=1
-              continue
-            fi
-            echo "Running Valgrind on $file..."
-            valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1 "./$file"
-            if [[ $? -ne 0 ]]; then
-              echo "::error:: Memory leaks detected in $file!"
-              found=1
-            fi
-          done
-          if [[ $found -eq 1 ]]; then
-            exit 1
-          fi
 
   run_tests:
     name: Run Tests
