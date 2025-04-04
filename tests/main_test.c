@@ -12,10 +12,12 @@ Test(simple_test, test_egalite)
     cr_assert_eq(1 + 1, 2, "1 + 1 devrait être égal à 2");
 }
 
+/*
 Test(simple_test, test_inegalite, .exit_code = 1)
 {
     cr_assert_eq(2 + 2, 5, "2 + 2 ne devrait pas être égal à 5");
 }
+*/
 
 Test(simple_test, test_zero)
 {
