@@ -87,6 +87,36 @@ jobs:
             fi
           done
 
+  check_memory_leaks:
+    name: "Memory Leak Check"
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker
+    needs: check_program_compilation
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Valgrind on Executables
+        run: |
+          found=0
+          for file in ${{ vars.EXECUTABLES }}; do
+            if [ ! -x "$file" ]; then
+              echo "::error:: Executable '$file' not found or not executable!"
+              found=1
+              continue
+            fi
+            echo "Running Valgrind on $file..."
+            valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1 "./$file"
+            if [[ $? -ne 0 ]]; then
+              echo "::error:: Memory leaks detected in $file!"
+              found=1
+            fi
+          done
+          if [[ $found -eq 1 ]]; then
+            exit 1
+          fi
+
   run_tests:
     name: Run Tests
     runs-on: ubuntu-latest
