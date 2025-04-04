@@ -1,5 +1,6 @@
 name: chocolatine
 run-name: ${{github.actor}} choco's check
+
 on:
   push:
     branches-ignore:
@@ -7,16 +8,20 @@ on:
   pull_request:
     branches-ignore:
       - " ga-ignore-"
+
 env:
   MIRROR_URL: "git@github.com:EpitechPGEPromo2029/B-DOP-200-MLN-2-1-chocolatine-sacha.lamour.git"
   EXECUTABLES: "my_radar"
+
 jobs:
   check_coding_style:
+    name: Check Coding Style
     runs-on: ubuntu-latest
-    container: ghcr.io/epitech/coding-style-checker:latest
+    continue-on-error: false
+    container:
+      image: ghcr.io/epitech/coding-style-checker:latest
     steps:
-
-      - name: Checkout GH repository
+      - name: Checkout repository
         uses: actions/checkout@master
         with:
           repository: ''
@@ -29,24 +34,26 @@ jobs:
         run: cat coding-style-reports.log && exit 1
 
   check_program_compilation:
+    name: Check Compilation
     runs-on: ubuntu-latest
     timeout-minutes: 2
-    container: epitechcontent/epitest-docker:latest
+    container:
+      image: epitechcontent/epitest-docker
     needs: check_coding_style
+    continue-on-error: false
     steps:
-
-      - name: Checkout GH repository
+      - name: Checkout repository
         uses: actions/checkout@master
         with:
           repository: ''
 
-      - name: Compile repository
+      - name: Compile Project
         run: make
 
-      - name: Clean repository
+      - name: Clean Project
         run: make clean
 
-      - name: Check file
+      - name: Verify Executables
         run: |
           for file in ${{ env.EXECUTABLES }};do
              if [ ! -x "$file" ]; then
@@ -70,6 +77,7 @@ jobs:
         run: timeout 120 make tests_run
 
   push_to_mirror:
+    name: Push to Mirror
     runs-on: ubuntu-latest
     needs:  run_tests
     if: github.event_name == 'push'
