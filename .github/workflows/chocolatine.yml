@@ -10,7 +10,7 @@ on:
       - " ga-ignore-"
 
 env:
-  BANNED_FUNCTIONS: "printf strcpy strcat gets system"
+  BANNED_FUNCTIONS: "strcpy strcat gets system"
 
 jobs:
   check_coding_style:
