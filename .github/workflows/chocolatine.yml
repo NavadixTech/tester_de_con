@@ -1,5 +1,5 @@
 name: chocolatine
-run-name: ${{ github.actor }} - ${{ github.action }} - ${{ github.workflow }} - ${{ github.ref }}
+run-name: ${{ github.actor }} - ${{ github.workflow }} - ${{ github.ref }}
 
 on:
   push:
@@ -8,6 +8,9 @@ on:
   pull_request:
     branches-ignore:
       - " ga-ignore-"
+
+env:
+  BANNED_FUNCTIONS: "printf strcpy strcat gets system"
 
 jobs:
   check_coding_style:
@@ -34,20 +37,40 @@ jobs:
             fi
           '
 
+  check_banned_functions:
+    name: "Check Banned Functions"
+    runs-on: ubuntu-latest
+    needs: check_coding_style
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan for Banned Functions (Root Files Only)
+        run: |
+          banned=($BANNED_FUNCTIONS)
+          found=0
+          for file in $(find . -maxdepth 1 -name "*.c"); do
+            for func in "${banned[@]}"; do
+              if grep -q "$func" "$file"; then
+                echo "::error file=$file:: Banned function '$func' detected!"
+                found=1
+              fi
+            done
+          done
+          if [[ $found -eq 1 ]]; then
+            exit 1
+          fi
+
   check_program_compilation:
     name: Check Compilation
     runs-on: ubuntu-latest
     timeout-minutes: 2
     container:
       image: epitechcontent/epitest-docker
-    needs: check_coding_style
-    if: ${{ github.repository != 'EpitechPGEPromo2029/B-DOP-200-MLN-2-1-chocolatine-sacha.lamour' }}
+    needs: check_banned_functions
     continue-on-error: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@master
-        with:
-          repository: ''
 
       - name: Compile Project
         run: make
