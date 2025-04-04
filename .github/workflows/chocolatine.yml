@@ -99,6 +99,7 @@ jobs:
 
       - name: Run Valgrind on Executables
         run: |
+          make
           found=0
           for file in ${{ vars.EXECUTABLES }}; do
             if [ ! -x "$file" ]; then
