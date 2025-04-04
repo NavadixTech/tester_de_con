@@ -25,6 +25,8 @@ fclean: clean
 re: fclean all
 
 tests_run:
-	$(MAKE) -C tests run
+	gcc -o unit_tests tests/test_main.c -lcriterion --coverage
+	./unit_tests || exit 1
+
 
 .PHONY: all clean fclean re tests_run

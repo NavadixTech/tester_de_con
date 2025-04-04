@@ -19,5 +19,5 @@ void redirect_all_stdout(void)
 Test(main, output_test, .init = redirect_all_stdout)
 {
     main();
-    cr_assert_stdout_eq_str("Hello, Chocolatine CI!\n");
+    cr_assert_stdout_eq_str("Hzello,      Chocolatine CI!\n");
 }
