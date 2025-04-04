@@ -165,7 +165,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           STATUS="✅ Build Succeeded"
-          &COLOR="3066993"  # Vert
+          COLOR="3066993"  # Vert
           if [[ "${{ job.status }}" != "success" ]]; then
             STATUS="❌ Build Failed"
             COLOR="15158332"  # Rouge
