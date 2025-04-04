@@ -56,19 +56,18 @@ jobs:
           done
 
   run_tests:
+    name: Run Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 2
-    container: epitechcontent/epitest-docker:latest
-    needs:  check_program_compilation
+    continue-on-error: false
+    container:
+      image: epitechcontent/epitest-docker
+    needs: check_program_compilation
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Checkout GH repository
-        uses: actions/checkout@master
-        with:
-          repository: ''
-
-      - name: Compile tests binaries
-        run: make tests_run
+      - name: Run Tests
+        run: timeout 120 make tests_run
 
   push_to_mirror:
     runs-on: ubuntu-latest
