@@ -1,5 +1,5 @@
 name: chocolatine
-run-name: ${{github.actor}} choco's check
+run-name: ${{github.action}} - ${{github.workflow}} - ${{github.ref}}
 
 on:
   push:
@@ -15,21 +15,25 @@ env:
 
 jobs:
   check_coding_style:
-    name: Check Coding Style
+    name: "Use coding_style_checker script to verify if the code is clean and report any coding-style errors"
     runs-on: ubuntu-latest
-    continue-on-error: false
-    container:
-      image: ghcr.io/epitech/coding-style-checker:latest
+    container: ghcr.io/epitech/coding-style-checker:latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Run Coding Style Check
-        run: check.sh $(pwd) $(pwd)
-
-      - name: Display Errors
-        if: failure()
-        run: cat coding-style-reports.log && exit 1
+      - uses: actions/checkout@v4
+      - id: check_coding_style
+        run: |
+          check.sh $(pwd) $(pwd)
+          CODING_STYLE_ERRORS=$(cat $(pwd)/coding-style-reports.log)
+          for ERRORS in $CODING_STYLE_ERRORS; do
+            array=(`echo $ERRORS | sed 's/:/\n/g'`)
+            echo "::error file=${array[1]#./},title=${array[3]#./} coding style errors detected: ${array[2]#./}::${array[4]#./}"
+          done
+          if [[ -n $CODING_STYLE_ERRORS ]]
+          then
+            exit 1
+          else
+            echo No coding style errors detected
+          fi
 
   check_program_compilation:
     name: Check Compilation
