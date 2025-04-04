@@ -9,10 +9,6 @@ on:
     branches-ignore:
       - " ga-ignore-"
 
-env:
-  MIRROR_URL: "git@github.com:EpitechPGEPromo2029/B-DOP-200-MLN-2-1-chocolatine-sacha.lamour.git"
-  EXECUTABLES: "my_radar"
-
 jobs:
   check_coding_style:
     name: "Coding Style Check"
@@ -61,7 +57,7 @@ jobs:
 
       - name: Verify Executables
         run: |
-          for file in ${{ env.EXECUTABLES }}; do
+          for file in ${{ vars.EXECUTABLES }}; do
              if [ ! -x "$file" ]; then
               echo "File $file does not exist or is not executable"
               exit 1
@@ -100,5 +96,5 @@ jobs:
           fetch-depth: 0
       - uses: pixta-dev/repository-mirroring-action@v1
         with:
-          target_repo_url: ${{ env.MIRROR_URL }}
+          target_repo_url: ${{ vars.MIRROR_URL }}
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
