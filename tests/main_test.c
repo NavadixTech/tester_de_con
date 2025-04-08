@@ -17,7 +17,6 @@ Test(simple_test, test_inegalite, .exit_code = 1)
     cr_assert_eq(2 + 2, 5, "2 + 2 ne devrait pas être égal à 5");
 }
 
-
 Test(simple_test, test_zero)
 {
     cr_assert_neq(0, 1, "0 ne devrait pas être égal à 1");
