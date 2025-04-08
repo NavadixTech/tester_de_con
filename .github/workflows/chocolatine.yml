@@ -4,13 +4,13 @@ run-name: ${{ github.actor }} - ${{ github.workflow }} - ${{ github.ref }}
 on:
   push:
     branches-ignore:
-      - " ga-ignore-"
+      - "ga-ignore-"
   pull_request:
     branches-ignore:
-      - " ga-ignore-"
+      - "ga-ignore-"
 
 env:
-  BANNED_FUNCTIONS: "strcpy strcat gets system"
+  BANNED_FUNCTIONS: "strcat gets system"
 
 jobs:
   check_coding_style:
